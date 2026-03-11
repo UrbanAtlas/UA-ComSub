@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urban Atlas — Community Submissions</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100vh;font-family:'Press Start 2P',monospace;overflow-x:hidden}
+.sky-bg{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,#1b2a3e 0%,#2a4a6e 8%,#c4692a 32%,#e0843a 48%,#f0a848 58%,#f5c060 68%,#c49040 82%,#3a2814 100%)}
+.clouds{position:fixed;top:4%;left:0;right:0;z-index:1;height:120px;pointer-events:none}
+.cloud{position:absolute;background:rgba(255,250,235,.82)}
+.c1{width:16px;height:8px;top:10px;left:8%;box-shadow:16px 0 0 rgba(255,250,235,.82),32px 0 0 rgba(255,250,235,.82),48px 0 0 rgba(255,250,235,.82),-16px 8px 0 rgba(255,250,235,.82),0 8px 0 rgba(255,250,235,.82),16px 8px 0 rgba(255,250,235,.82),32px 8px 0 rgba(255,250,235,.82),48px 8px 0 rgba(255,250,235,.82),64px 8px 0 rgba(255,250,235,.82),0 16px 0 rgba(255,250,235,.82),16px 16px 0 rgba(255,250,235,.82),32px 16px 0 rgba(255,250,235,.82),48px 16px 0 rgba(255,250,235,.82);animation:drift 40s linear infinite}
+.c2{width:12px;height:8px;top:30px;left:55%;box-shadow:12px 0 0 rgba(255,250,235,.7),24px 0 0 rgba(255,250,235,.7),-12px 8px 0 rgba(255,250,235,.7),0 8px 0 rgba(255,250,235,.7),12px 8px 0 rgba(255,250,235,.7),24px 8px 0 rgba(255,250,235,.7),36px 8px 0 rgba(255,250,235,.7);animation:drift 60s linear infinite}
+.c3{width:8px;height:8px;top:8px;left:35%;box-shadow:8px 0 0 rgba(255,250,235,.6),16px 0 0 rgba(255,250,235,.6),0 8px 0 rgba(255,250,235,.6),8px 8px 0 rgba(255,250,235,.6),16px 8px 0 rgba(255,250,235,.6),24px 8px 0 rgba(255,250,235,.6);animation:drift 50s linear 10s infinite}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-120vw)}}
+.mountains{position:fixed;bottom:22%;left:0;right:0;z-index:2;height:160px;pointer-events:none;overflow:hidden}
+.mountains::before{content:'';position:absolute;bottom:0;left:-5%;width:110%;height:160px;background:linear-gradient(135deg,transparent 50%,#3a5a30 50%) -80px 0/80px 80px repeat-x,linear-gradient(225deg,transparent 50%,#3a5a30 50%) -40px 0/80px 80px repeat-x,linear-gradient(135deg,transparent 50%,#2a4a22 50%) 20px 20px/100px 100px repeat-x,linear-gradient(225deg,transparent 50%,#2a4a22 50%) 70px 20px/100px 100px repeat-x;background-color:#2d4a20}
+.ground-strip{position:fixed;bottom:0;left:0;right:0;z-index:5;height:22%;pointer-events:none;background:linear-gradient(180deg,#7a6040 0%,#6a5030 15%,#8a7050 20%,#7a6040 35%,#5a4828 50%,#4a3c20 100%)}
+.ground-strip::after{content:'';position:absolute;top:30%;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,rgba(255,230,100,.6) 0 24px,transparent 24px 48px)}
+#titleScreen{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:40px 20px 120px}
+.game-title-wrap{margin-top:32px;text-align:center;animation:titleFloat 3s ease-in-out infinite}
+@keyframes titleFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+.game-title{font-family:'Silkscreen',monospace;font-size:clamp(42px,11vw,80px);color:#d0eeff;text-shadow:3px 0 0 #6ab8e8,-3px 0 0 #6ab8e8,0 3px 0 #3a7aaa,4px 4px 0 #1a3a5a,6px 6px 0 rgba(0,0,0,.5);line-height:1;display:block}
+.game-subtitle{font-size:clamp(7px,2.2vw,11px);color:#e0f4ff;text-shadow:2px 2px 0 #1a4a6a;margin-top:10px;letter-spacing:1px}
+.menu-btn-group{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:40px;width:100%;max-width:340px}
+.menu-btn{width:100%;font-family:'Press Start 2P',monospace;font-size:clamp(10px,2.5vw,13px);color:#fff;text-shadow:2px 2px 0 #0d3352;cursor:pointer;border:none;padding:16px 24px;background:linear-gradient(180deg,#7ec8f0 0%,#3a9cd8 20%,#2278b8 60%,#1a5a90 100%);outline:3px solid #a8dff8;outline-offset:-3px;box-shadow:0 0 0 3px #0d3352,4px 4px 0 #0d3352;border-top:3px solid rgba(255,255,255,.5);border-bottom:3px solid rgba(0,0,0,.4);text-align:center;line-height:1.4;transition:filter .1s,transform .08s}
+.menu-btn:hover{filter:brightness(1.15);transform:translate(-2px,-2px)}
+.menu-btn:active{transform:translate(3px,3px)}
+.menu-btn.pulse{animation:btnPulse 1.5s ease-in-out infinite}
+@keyframes btnPulse{0%,100%{box-shadow:0 0 0 3px #0d3352,4px 4px 0 #0d3352,0 0 20px rgba(100,180,255,.3)}50%{box-shadow:0 0 0 3px #0d3352,4px 4px 0 #0d3352,0 0 30px rgba(100,180,255,.7)}}
+.panel{display:none;position:relative;z-index:20;min-height:100vh;padding:0 16px 100px}
+.panel.active{display:block}
+.panel-hdr{padding:24px 0 8px;text-align:center}
+.panel-title{font-family:'Silkscreen',monospace;font-size:clamp(20px,6vw,36px);color:#d0eeff;text-shadow:3px 3px 0 #1a3a5a;display:block;line-height:1}
+.panel-sub{font-size:7px;color:#f5d898;margin-top:8px;letter-spacing:1px}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Press Start 2P',monospace;font-size:8px;color:#fff;cursor:pointer;border:none;padding:10px 16px;background:linear-gradient(180deg,#7ec8f0 0%,#2278b8 60%,#1a5a90 100%);outline:3px solid #a8dff8;outline-offset:-3px;box-shadow:0 0 0 3px #0d3352,3px 3px 0 #0d3352;border-top:2px solid rgba(255,255,255,.5);border-bottom:2px solid rgba(0,0,0,.4);margin:16px 0 8px;text-shadow:1px 1px 0 #0d3352;transition:filter .1s}
+.back-btn:hover{filter:brightness(1.15)}
+.back-btn:active{transform:translate(2px,2px)}
+.dialog-box{background:linear-gradient(180deg,#e8c888 0%,#d4a860 30%,#c09048 100%);border:4px solid #f5d898;border-right-color:#7a4e20;border-bottom-color:#7a4e20;box-shadow:5px 5px 0 #3a2410,0 0 0 2px #3a2410;margin-bottom:16px}
+.dialog-titlebar{background:linear-gradient(90deg,#5a3418,#7a4e28 50%,#5a3418);padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:3px solid #3a2410}
+.dialog-dot{width:10px;height:10px;border:2px solid rgba(0,0,0,.4)}
+.dialog-dot.r{background:#c0392b}.dialog-dot.y{background:#f0b429}.dialog-dot.g{background:#4caf50}
+.dialog-bar-txt{font-size:7px;color:#f5d898;letter-spacing:1px;flex:1}
+.dialog-body{padding:22px}
+.fg{margin-bottom:18px}
+.fg label{display:block;font-size:7px;color:#5a3010;letter-spacing:.5px;margin-bottom:7px;text-transform:uppercase}
+.req{color:#c0392b;margin-left:3px}
+.rpg-in,.rpg-ta{width:100%;background:#fff8e8;border:3px solid #8a5a28;border-right-color:#4a2e10;border-bottom-color:#4a2e10;color:#3a2010;font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 12px;outline:none;line-height:1.6}
+.rpg-in:focus,.rpg-ta:focus{border-color:#2278b8;border-right-color:#1a4a78;border-bottom-color:#1a4a78}
+.rpg-in::placeholder,.rpg-ta::placeholder{color:#b09060;font-size:8px}
+.rpg-in.err{border-color:#c0392b!important;background:#fff0f0!important}
+.rpg-ta{min-height:100px;resize:vertical}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cat-opt{position:relative}
+.cat-opt input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.cat-lbl{display:flex;align-items:center;gap:8px;padding:9px 12px;background:linear-gradient(180deg,#5a88b8,#2a5888 60%,#1a3a60);border:2px solid rgba(255,255,255,.35);border-right-color:rgba(0,0,0,.3);border-bottom-color:rgba(0,0,0,.3);box-shadow:2px 2px 0 #0d2040;cursor:pointer;font-family:'Press Start 2P',monospace;font-size:7px;color:#d0eeff;user-select:none;transition:filter .1s}
+.cat-lbl:hover{filter:brightness(1.2)}
+.cat-opt input:checked+.cat-lbl{background:linear-gradient(180deg,#90d060,#4a9020 60%,#2a6010);color:#e8ffe0}
+.cat-chk{width:10px;height:10px;border:2px solid currentColor;flex-shrink:0;position:relative}
+.cat-opt input:checked+.cat-lbl .cat-chk::after{content:'';position:absolute;inset:1px;background:#a0ff60}
+.cat-icon{font-size:14px;width:20px;text-align:center}
+.cat-err{display:none;font-size:7px;color:#c0392b;margin-top:6px}
+.cat-err.show{display:block}
+.rpg-btn{width:100%;font-family:'Press Start 2P',monospace;font-size:10px;color:#fff;text-shadow:2px 2px 0 #0d3352;cursor:pointer;border:none;padding:16px 24px;background:linear-gradient(180deg,#7ec8f0 0%,#3a9cd8 20%,#2278b8 60%,#1a5a90 100%);outline:3px solid #a8dff8;outline-offset:-3px;box-shadow:0 0 0 3px #0d3352,4px 4px 0 #0d3352;border-top:3px solid rgba(255,255,255,.5);border-bottom:3px solid rgba(0,0,0,.4);margin-top:8px;letter-spacing:1px;transition:filter .1s,transform .08s}
+.rpg-btn:hover{filter:brightness(1.15);transform:translate(-1px,-1px)}
+.rpg-btn:active{transform:translate(3px,3px)}
+.rpg-btn:disabled{filter:grayscale(.5) brightness(.8);cursor:not-allowed}
+.hp-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.hp-lbl{font-size:6px;color:#d0eeff;width:50px;flex-shrink:0}
+.hp-bg{flex:1;height:10px;background:#0d2040;border:2px solid #1a4a70;overflow:hidden}
+.hp-fill{height:100%;background:linear-gradient(90deg,#50c830,#a0f060);width:0%;transition:width .4s ease}
+.hp-val{font-size:6px;color:#a0f060;width:32px;text-align:right;flex-shrink:0}
+.succ{display:none;text-align:center;padding:40px 16px}
+.succ-spr{font-size:48px;display:block;margin-bottom:14px;animation:bnc .7s ease infinite alternate}
+@keyframes bnc{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+.succ-ttl{font-family:'Silkscreen',monospace;font-size:clamp(18px,5vw,28px);color:#d0eeff;text-shadow:3px 3px 0 #1a3a5a;margin-bottom:12px}
+.succ-msg{font-size:8px;color:#f5d898;line-height:1.9}
+#loginWrap{max-width:380px;margin:0 auto;padding-top:32px}
+#loginErr{display:none;font-size:8px;color:#c0392b;margin-bottom:12px;line-height:1.7}
+.admin-stat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.stat-box{background:linear-gradient(180deg,#1a4a70,#0d2a48);border:3px solid #3a8ac8;border-right-color:#0d1a28;border-bottom-color:#0d1a28;box-shadow:3px 3px 0 #0d1a28;padding:10px 12px;flex:1;min-width:70px;text-align:center}
+.stat-num{font-size:16px;color:#a0f0ff;display:block;line-height:1.3}
+.stat-lbl{font-size:5px;color:#7abcd8;margin-top:4px}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.rpg-search{background:#fff8e8;border:3px solid #8a5a28;border-right-color:#4a2e10;border-bottom-color:#4a2e10;color:#3a2010;font-family:'Press Start 2P',monospace;font-size:8px;padding:8px 10px;outline:none;flex:1;min-width:120px}
+.rpg-sel{background:#fff8e8;border:3px solid #8a5a28;border-right-color:#4a2e10;border-bottom-color:#4a2e10;color:#3a2010;font-family:'Press Start 2P',monospace;font-size:7px;padding:8px 10px;outline:none;cursor:pointer}
+.entry-card{background:#fff8e8;border:3px solid #8a5a28;border-right-color:#4a2e10;border-bottom-color:#4a2e10;box-shadow:3px 3px 0 #3a2010;margin-bottom:12px}
+.entry-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:2px solid #c8a060;cursor:pointer;flex-wrap:wrap}
+.badge{font-size:5px;padding:3px 7px;border:2px solid currentColor;white-space:nowrap;flex-shrink:0}
+.badge.history{color:#8a6010}.badge.landmark{color:#1a5a8a}.badge.feature{color:#2a7020}.badge.criticism{color:#8a2010}
+.entry-ttl{font-size:7px;color:#3a2010;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.entry-who{font-size:6px;color:#8a6040;flex-shrink:0}
+.entry-body{display:none;padding:14px}
+.entry-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.entry-key{font-size:5px;color:#5a7830;width:80px;flex-shrink:0;padding-top:2px}
+.entry-val{font-size:8px;color:#3a2010;flex:1;line-height:1.7;word-break:break-word}
+.entry-ts{font-size:5px;color:#8a6040;margin-top:8px}
+.del-btn{font-family:'Press Start 2P',monospace;font-size:7px;color:#fff;cursor:pointer;border:none;padding:8px 14px;background:linear-gradient(180deg,#c04040,#801818);box-shadow:2px 2px 0 #400000;margin-top:10px;transition:filter .1s}
+.del-btn:hover{filter:brightness(1.2)}
+.act-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.act-btn{font-family:'Press Start 2P',monospace;font-size:7px;color:#fff;cursor:pointer;border:none;padding:8px 12px;box-shadow:2px 2px 0 rgba(0,0,0,.4);transition:filter .1s,transform .05s}
+.act-btn:hover{filter:brightness(1.2)}
+.act-btn:active{transform:translate(1px,1px)}
+.act-btn.flag{background:linear-gradient(180deg,#e8a020,#a06010);box-shadow:2px 2px 0 #503000}
+.act-btn.complete{background:linear-gradient(180deg,#40a840,#206020);box-shadow:2px 2px 0 #0a300a}
+.act-btn.del{background:linear-gradient(180deg,#c04040,#801818);box-shadow:2px 2px 0 #400000}
+.act-btn.unflag{background:linear-gradient(180deg,#6888b0,#3a5880);box-shadow:2px 2px 0 #1a2840}
+.act-btn.uncomplete{background:linear-gradient(180deg,#6888b0,#3a5880);box-shadow:2px 2px 0 #1a2840}
+.status-pip{font-size:9px;flex-shrink:0}
+.entry-card.flagged{border-color:#c88020;border-left:5px solid #e8a020;background:#fffbe8}
+.entry-card.flagged .entry-head{background:rgba(232,160,32,.08)}
+.entry-card.complete{border-color:#2a8040;border-left:5px solid #40a840;background:#f0fff0}
+.entry-card.complete .entry-head{background:rgba(64,168,64,.08)}
+.empty-msg{font-size:8px;color:#8a6040;text-align:center;padding:28px 0;line-height:2}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(40px);background:linear-gradient(180deg,#1a4a70,#0d2a48);color:#a0f0ff;border:3px solid #3a8ac8;font-size:9px;padding:12px 20px;opacity:0;transition:all .3s;pointer-events:none;z-index:10000;max-width:90vw;white-space:normal;text-align:center;box-shadow:3px 3px 0 #0d1a28}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:linear-gradient(180deg,#5a1010,#3a0808);color:#ff8080;border-color:#c0392b}
+#loadOv{display:none;position:fixed;inset:0;background:rgba(26,20,10,.88);z-index:8000;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#loadOv.on{display:flex}
+.ld-ico{font-size:40px;animation:bnc .6s ease infinite alternate}
+.ld-txt{font-size:9px;color:#a0f0ff;text-align:center;padding:0 20px}
+</style>
+</head>
+<body>
+<div class="sky-bg"></div>
+<div class="clouds"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div></div>
+<div class="mountains"></div>
+<div class="ground-strip"></div>
+<div id="loadOv"><div class="ld-ico">⚙️</div><div class="ld-txt" id="loadTxt">LOADING...</div></div>
+<div id="toast"></div>
+
+<!-- TITLE -->
+<div id="titleScreen">
+  <div class="game-title-wrap">
+    <span class="game-title">Urban Atlas</span>
+    <div class="game-subtitle">Barangay Commonwealth Pocket-Sized!</div>
+  </div>
+  <div class="menu-btn-group">
+    <button class="menu-btn pulse" id="btnGoSubmit">Community<br>Submissions</button>
+    <button class="menu-btn" id="btnGoAdmin">🔒 Admin Panel</button>
+  </div>
+</div>
+
+<!-- SUBMIT PANEL -->
+<div id="submitPanel" class="panel">
+  <div class="panel-hdr">
+    <span class="panel-title">Community Submissions</span>
+    <div class="panel-sub">▶ Share your entry with the community ◀</div>
+  </div>
+  <button class="back-btn" id="btnSubmitBack">◀ BACK</button>
+  <div class="hp-row">
+    <div class="hp-lbl">PROGRESS</div>
+    <div class="hp-bg"><div class="hp-fill" id="progressBar"></div></div>
+    <div class="hp-val" id="progressVal">0%</div>
+  </div>
+  <div id="formWrap">
+    <div class="dialog-box">
+      <div class="dialog-titlebar">
+        <div class="dialog-dot r"></div><div class="dialog-dot y"></div><div class="dialog-dot g"></div>
+        <span class="dialog-bar-txt">NEW_SUBMISSION.EXE</span>
+      </div>
+      <div class="dialog-body">
+        <div class="fg"><label for="sName">Name of Submitter <span class="req">*</span></label><input class="rpg-in" type="text" id="sName" placeholder="Enter your name..."></div>
+        <div class="fg">
+          <label>Category <span class="req">*</span></label>
+          <div class="cat-grid">
+            <div class="cat-opt"><input type="radio" name="cat" id="cH" value="History"><label class="cat-lbl" for="cH"><div class="cat-chk"></div><span class="cat-icon">📜</span>History</label></div>
+            <div class="cat-opt"><input type="radio" name="cat" id="cL" value="Landmark"><label class="cat-lbl" for="cL"><div class="cat-chk"></div><span class="cat-icon">🗺️</span>Landmark</label></div>
+            <div class="cat-opt"><input type="radio" name="cat" id="cF" value="Feature"><label class="cat-lbl" for="cF"><div class="cat-chk"></div><span class="cat-icon">⚙️</span>Feature</label></div>
+            <div class="cat-opt"><input type="radio" name="cat" id="cC" value="Criticism"><label class="cat-lbl" for="cC"><div class="cat-chk"></div><span class="cat-icon">💬</span>Criticism</label></div>
+          </div>
+          <div class="cat-err" id="catErr">► Please select a category.</div>
+        </div>
+        <div class="fg"><label for="sTitle">Entry Title <span class="req">*</span></label><input class="rpg-in" type="text" id="sTitle" placeholder="Give your entry a title..."></div>
+        <div class="fg"><label for="sDesc">Description <span class="req">*</span></label><textarea class="rpg-ta" id="sDesc" placeholder="Describe your entry in detail..."></textarea></div>
+        <div class="fg"><label for="sNotes">Additional Notes <span style="color:#b09060;font-size:5px">(OPTIONAL)</span></label><textarea class="rpg-ta" id="sNotes" placeholder="Extra info, sources, context..." style="min-height:70px"></textarea></div>
+        <button class="rpg-btn" id="subBtn">▶ SUBMIT ENTRY</button>
+      </div>
+    </div>
+  </div>
+  <div class="succ" id="succScreen">
+    <span class="succ-spr">🌟</span>
+    <div class="succ-ttl">Entry Submitted!</div>
+    <div class="succ-msg">Your entry has been saved<br>to the community database.<br><br>► AWAITING REVIEW ◄</div>
+    <br><br>
+    <button class="rpg-btn" id="btnReset" style="max-width:280px;margin:0 auto;display:block">↩ SUBMIT ANOTHER</button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLoginPanel" class="panel">
+  <div class="panel-hdr"><span class="panel-title">Admin Access</span><div class="panel-sub">▶ Secure Login ◀</div></div>
+  <button class="back-btn" id="btnLoginBack">◀ BACK</button>
+  <div style="max-width:380px;margin:0 auto;padding-top:32px">
+    <div class="dialog-box">
+      <div class="dialog-titlebar"><div class="dialog-dot r"></div><div class="dialog-dot y"></div><div class="dialog-dot g"></div><span class="dialog-bar-txt">ADMIN_LOGIN.EXE</span></div>
+      <div class="dialog-body">
+        <div class="fg"><label for="aPass">Password <span class="req">*</span></label><input class="rpg-in" type="password" id="aPass" placeholder="Enter password..."></div>
+        <div id="loginErr" style="display:none;font-size:8px;color:#c0392b;margin-bottom:12px">► WRONG PASSWORD. TRY AGAIN.</div>
+        <button class="rpg-btn" id="btnLogin">🔓 LOGIN</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="dashPanel" class="panel">
+  <div class="panel-hdr"><span class="panel-title">Admin Dashboard</span><div class="panel-sub">▶ Manage Submissions ◀</div></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:8px 0 4px">
+    <button class="back-btn" style="margin:0" id="btnLogout">🚪 LOGOUT</button>
+    <button class="back-btn" style="margin:0" id="btnRefresh">⚙ REFRESH</button>
+  </div>
+  <div class="admin-stat-row">
+    <div class="stat-box"><span class="stat-num" id="stAll">—</span><div class="stat-lbl">TOTAL</div></div>
+    <div class="stat-box"><span class="stat-num" id="stH">—</span><div class="stat-lbl">HISTORY</div></div>
+    <div class="stat-box"><span class="stat-num" id="stL">—</span><div class="stat-lbl">LANDMARK</div></div>
+    <div class="stat-box"><span class="stat-num" id="stF">—</span><div class="stat-lbl">FEATURE</div></div>
+    <div class="stat-box"><span class="stat-num" id="stC">—</span><div class="stat-lbl">CRITICISM</div></div>
+  </div>
+  <div class="toolbar">
+    <input class="rpg-search" id="srch" placeholder="🔍 SEARCH...">
+    <select class="rpg-sel" id="filt">
+      <option value="">ALL TYPES</option><option value="History">HISTORY</option><option value="Landmark">LANDMARK</option><option value="Feature">FEATURE</option><option value="Criticism">CRITICISM</option>
+    </select>
+    <select class="rpg-sel" id="filtStatus">
+      <option value="">ALL STATUS</option>
+      <option value="flagged">⚑ FLAGGED</option>
+      <option value="complete">✔ COMPLETE</option>
+      <option value="pending">● PENDING</option>
+    </select>
+  </div>
+  <div id="entCon"><div class="empty-msg">► NO ENTRIES LOADED YET.</div></div>
+</div>
+
+<script type="module">
+import { initializeApp }    from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, updateDoc, query, orderBy, serverTimestamp }
+                            from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+
+// ── Init — explicitly target the "submissions" named database ──
+const app = initializeApp({
+  apiKey:            'AIzaSyAQv7AYMNPv6BzP8V1UOlTndvZvMRDse7Y',
+  authDomain:        'community-submissions-c8162.firebaseapp.com',
+  projectId:         'community-submissions-c8162',
+  storageBucket:     'community-submissions-c8162.firebasestorage.app',
+  messagingSenderId: '136847800677',
+  appId:             '1:136847800677:web:a9fcf5ee88f9685d04c98c'
+});
+
+// Pass the named database ID as second argument — this is the correct way in v11
+const db = getFirestore(app, 'submissions');
+
+// ── State ──
+let allEntries = [];
+const ADMIN_PW = 'AdminGroup3';
+
+// ── Helpers ──
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.className = '', 4000);
+}
+function load(on, txt) {
+  document.getElementById('loadOv').classList[on ? 'add' : 'remove']('on');
+  if (txt) document.getElementById('loadTxt').textContent = txt;
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function timed(promise, ms = 10000) {
+  return Promise.race([
+    promise,
+    new Promise((_, rej) => setTimeout(() => rej(new Error('Request timed out. Make sure your Firestore rules allow read/write and the database name is "submissions".')), ms))
+  ]);
+}
+
+// ── Navigation ──
+function openTitle() {
+  document.getElementById('titleScreen').style.display = '';
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  window.scrollTo(0, 0);
+}
+function openPanel(id) {
+  document.getElementById('titleScreen').style.display = 'none';
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Progress ──
+function updProg() {
+  const ids = ['sName','sTitle','sDesc'];
+  let filled = ids.filter(id => document.getElementById(id).value.trim()).length;
+  if ([...document.querySelectorAll('input[name="cat"]')].some(r => r.checked)) filled++;
+  const pct = Math.round(filled / (ids.length + 1) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressVal').textContent = pct + '%';
+}
+['sName','sTitle','sDesc'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', updProg);
+  el.addEventListener('focus', () => el.classList.remove('err'));
+});
+document.querySelectorAll('input[name="cat"]').forEach(r =>
+  r.addEventListener('change', () => { document.getElementById('catErr').classList.remove('show'); updProg(); })
+);
+
+// ── Submit ──
+async function doSubmit() {
+  const name  = document.getElementById('sName').value.trim();
+  const title = document.getElementById('sTitle').value.trim();
+  const desc  = document.getElementById('sDesc').value.trim();
+  const notes = document.getElementById('sNotes').value.trim();
+  const catEl = [...document.querySelectorAll('input[name="cat"]')].find(r => r.checked);
+  const cat   = catEl ? catEl.value : '';
+  let valid = true;
+  if (!name)  { document.getElementById('sName').classList.add('err');   valid = false; }
+  if (!title) { document.getElementById('sTitle').classList.add('err');  valid = false; }
+  if (!desc)  { document.getElementById('sDesc').classList.add('err');   valid = false; }
+  if (!cat)   { document.getElementById('catErr').classList.add('show'); valid = false; }
+  if (!valid) { toast('► Fill in all required fields.', true); return; }
+  const btn = document.getElementById('subBtn');
+  btn.disabled = true; btn.textContent = '⚙ SAVING...';
+  load(true, 'SAVING TO DATABASE...');
+  try {
+    await timed(addDoc(collection(db, 'submissions'), {
+      submitterName: name, category: cat, title, description: desc,
+      notes, createdAt: serverTimestamp()
+    }));
+    load(false);
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('succScreen').style.display = 'block';
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('progressVal').textContent = '100%';
+    toast('► Entry saved!');
+  } catch(err) {
+    load(false);
+    console.error(err);
+    toast('► ' + err.message, true);
+    btn.disabled = false; btn.textContent = '▶ SUBMIT ENTRY';
+  }
+}
+
+function resetForm() {
+  ['sName','sTitle','sDesc','sNotes'].forEach(id => { const el = document.getElementById(id); el.value = ''; el.classList.remove('err'); });
+  document.querySelectorAll('input[name="cat"]').forEach(r => r.checked = false);
+  document.getElementById('catErr').classList.remove('show');
+  document.getElementById('formWrap').style.display = '';
+  document.getElementById('succScreen').style.display = 'none';
+  const btn = document.getElementById('subBtn'); btn.disabled = false; btn.textContent = '▶ SUBMIT ENTRY';
+  document.getElementById('progressBar').style.width = '0%';
+  document.getElementById('progressVal').textContent = '0%';
+}
+
+// ── Admin login ──
+async function doLogin() {
+  const pass = document.getElementById('aPass').value;
+  if (!pass) { toast('► Enter a password.', true); return; }
+  document.getElementById('loginErr').style.display = 'none';
+  load(true, 'CHECKING PASSWORD...');
+  try {
+    let correct = false;
+    try {
+      const snap = await timed(getDoc(doc(db, 'config', 'admin')));
+      correct = snap.exists() ? (pass === snap.data().password) : (pass === ADMIN_PW);
+    } catch(e) {
+      // Firestore check failed — fall back to hardcoded password
+      correct = (pass === ADMIN_PW);
+    }
+    if (!correct) throw new Error('Wrong password.');
+    load(false);
+    document.getElementById('aPass').value = '';
+    openPanel('dashPanel');
+    await loadSubs();
+    toast('► Welcome, Admin!');
+  } catch(err) {
+    load(false);
+    document.getElementById('loginErr').style.display = '';
+    toast('► ' + err.message, true);
+  }
+}
+
+// ── Load submissions ──
+async function loadSubs() {
+  load(true, 'LOADING ENTRIES...');
+  try {
+    const snap = await timed(getDocs(query(collection(db, 'submissions'), orderBy('createdAt', 'desc'))));
+    allEntries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    load(false);
+    updStats(); renderEntries();
+  } catch(err) {
+    load(false);
+    console.error(err);
+    toast('► ' + err.message, true);
+    document.getElementById('entCon').innerHTML = '<div class="empty-msg">► Could not load. Check Firestore rules.</div>';
+  }
+}
+
+function updStats() {
+  document.getElementById('stAll').textContent = allEntries.length;
+  ['History','Landmark','Feature','Criticism'].forEach((cat, i) =>
+    document.getElementById(['stH','stL','stF','stC'][i]).textContent = allEntries.filter(e => e.category === cat).length
+  );
+}
+
+function renderEntries() {
+  const s  = (document.getElementById('srch').value || '').toLowerCase();
+  const f  = document.getElementById('filt').value;
+  const fs = document.getElementById('filtStatus').value;
+  const con = document.getElementById('entCon');
+  let list = allEntries;
+  if (f)  list = list.filter(e => e.category === f);
+  if (fs) list = list.filter(e => {
+    const st = e.status || 'pending';
+    return st === fs;
+  });
+  if (s) list = list.filter(e =>
+    (e.title||'').toLowerCase().includes(s) ||
+    (e.submitterName||'').toLowerCase().includes(s) ||
+    (e.description||'').toLowerCase().includes(s)
+  );
+  if (!list.length) { con.innerHTML = '<div class="empty-msg">► NO ENTRIES FOUND.</div>'; return; }
+  con.innerHTML = list.map(e => {
+    const ts     = e.createdAt?.toDate ? e.createdAt.toDate().toLocaleString() : '—';
+    const cat    = (e.category||'').toLowerCase();
+    const status = e.status || 'pending';
+    const pip    = status === 'flagged' ? '⚑' : status === 'complete' ? '✔' : '●';
+    const pipCol = status === 'flagged' ? '#e8a020' : status === 'complete' ? '#40a840' : '#8a6040';
+    const flagBtn    = status === 'flagged'
+      ? `<button class="act-btn unflag"   onclick="window._setStatus('${e.id}','pending')">✕ UNFLAG</button>`
+      : `<button class="act-btn flag"     onclick="window._setStatus('${e.id}','flagged')">⚑ FLAG</button>`;
+    const completeBtn = status === 'complete'
+      ? `<button class="act-btn uncomplete" onclick="window._setStatus('${e.id}','pending')">↩ REOPEN</button>`
+      : `<button class="act-btn complete"   onclick="window._setStatus('${e.id}','complete')">✔ COMPLETE</button>`;
+    return `<div class="entry-card ${status}" id="card-${e.id}">
+      <div class="entry-head" onclick="window._tog('${e.id}')">
+        <span class="status-pip" style="color:${pipCol}">${pip}</span>
+        <span class="badge ${cat}">${esc(e.category||'?')}</span>
+        <span class="entry-ttl">${esc(e.title||'—')}</span>
+        <span class="entry-who">${esc(e.submitterName||'—')}</span>
+        <span style="margin-left:6px;color:#8a6040">▼</span>
+      </div>
+      <div class="entry-body" id="body-${e.id}">
+        <div class="entry-row"><div class="entry-key">SUBMITTER</div><div class="entry-val">${esc(e.submitterName||'—')}</div></div>
+        <div class="entry-row"><div class="entry-key">CATEGORY</div><div class="entry-val">${esc(e.category||'—')}</div></div>
+        <div class="entry-row"><div class="entry-key">TITLE</div><div class="entry-val">${esc(e.title||'—')}</div></div>
+        <div class="entry-row"><div class="entry-key">DESCRIPTION</div><div class="entry-val">${esc(e.description||'—')}</div></div>
+        <div class="entry-row"><div class="entry-key">NOTES</div><div class="entry-val">${esc(e.notes||'None')}</div></div>
+        <div class="entry-row"><div class="entry-key">STATUS</div><div class="entry-val" style="color:${pipCol}">${pip} ${status.toUpperCase()}</div></div>
+        <div class="entry-ts">► SUBMITTED: ${ts}</div>
+        <div class="act-btns">
+          ${flagBtn}
+          ${completeBtn}
+          <button class="act-btn del" onclick="window._del('${e.id}')">🗑 DELETE</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Expose tog and del to inline onclick (module scope workaround)
+window._tog = id => {
+  const b = document.getElementById('body-' + id);
+  b.style.display = b.style.display === 'block' ? 'none' : 'block';
+};
+
+window._setStatus = async (id, status) => {
+  try {
+    await timed(updateDoc(doc(db, 'submissions', id), { status }));
+    const entry = allEntries.find(e => e.id === id);
+    if (entry) entry.status = status;
+    renderEntries();
+    const label = status === 'flagged' ? '⚑ Flagged!' : status === 'complete' ? '✔ Marked complete!' : '● Reopened.';
+    toast('► ' + label);
+  } catch(err) {
+    toast('► Update failed: ' + err.message, true);
+  }
+};
+
+window._del = async id => {
+  if (!confirm('Delete this entry? Cannot be undone.')) return;
+  load(true, 'DELETING...');
+  try {
+    await timed(deleteDoc(doc(db, 'submissions', id)));
+    allEntries = allEntries.filter(e => e.id !== id);
+    load(false); updStats(); renderEntries(); toast('► Entry deleted.');
+  } catch(err) { load(false); toast('► Delete failed: ' + err.message, true); }
+};
+
+// ── Wire buttons ──
+document.getElementById('btnGoSubmit').addEventListener('click',  () => openPanel('submitPanel'));
+document.getElementById('btnGoAdmin').addEventListener('click',   () => { openPanel('adminLoginPanel'); document.getElementById('loginErr').style.display = 'none'; document.getElementById('aPass').value = ''; });
+document.getElementById('btnSubmitBack').addEventListener('click', openTitle);
+document.getElementById('subBtn').addEventListener('click',       doSubmit);
+document.getElementById('btnReset').addEventListener('click',     resetForm);
+document.getElementById('btnLoginBack').addEventListener('click',  openTitle);
+document.getElementById('btnLogin').addEventListener('click',     doLogin);
+document.getElementById('aPass').addEventListener('keydown',      e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('btnLogout').addEventListener('click',    () => { openTitle(); toast('► Logged out.'); });
+document.getElementById('btnRefresh').addEventListener('click',   loadSubs);
+document.getElementById('srch').addEventListener('input',         renderEntries);
+document.getElementById('filt').addEventListener('change',        renderEntries);
+document.getElementById('filtStatus').addEventListener('change',  renderEntries);
+</script>
+</body>
+</html>
