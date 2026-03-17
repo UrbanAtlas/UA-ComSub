@@ -239,18 +239,18 @@ import { initializeApp }    from 'https://www.gstatic.com/firebasejs/11.6.0/fire
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, updateDoc, query, orderBy, serverTimestamp }
                             from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
-// ── Init — explicitly target the "submissions" named database ──
+// ── Firebase Config (NEW PROJECT) ──
 const app = initializeApp({
-  apiKey:            'AIzaSyAQv7AYMNPv6BzP8V1UOlTndvZvMRDse7Y',
-  authDomain:        'community-submissions-c8162.firebaseapp.com',
-  projectId:         'community-submissions-c8162',
-  storageBucket:     'community-submissions-c8162.firebasestorage.app',
-  messagingSenderId: '136847800677',
-  appId:             '1:136847800677:web:a9fcf5ee88f9685d04c98c'
+  apiKey:            'AIzaSyCmlUUtkQbLAv1SOizuiyv0yRmAKUPArSI',
+  authDomain:        'urban-atlas-submissions.firebaseapp.com',
+  projectId:         'urban-atlas-submissions',
+  storageBucket:     'urban-atlas-submissions.firebasestorage.app',
+  messagingSenderId: '687079341559',
+  appId:             '1:687079341559:web:672f58f18257bd059182f2'
 });
 
-// Pass the named database ID as second argument — this is the correct way in v11
-const db = getFirestore(app, 'submissions');
+// ── Use default Firestore database ──
+const db = getFirestore(app);
 
 // ── State ──
 let allEntries = [];
@@ -274,7 +274,7 @@ function esc(s) {
 function timed(promise, ms = 10000) {
   return Promise.race([
     promise,
-    new Promise((_, rej) => setTimeout(() => rej(new Error('Request timed out. Make sure your Firestore rules allow read/write and the database name is "submissions".')), ms))
+    new Promise((_, rej) => setTimeout(() => rej(new Error('Request timed out. Make sure Firestore is enabled in your Firebase project and rules allow read/write.')), ms))
   ]);
 }
 
@@ -462,7 +462,6 @@ function renderEntries() {
   }).join('');
 }
 
-// Expose tog and del to inline onclick (module scope workaround)
 window._tog = id => {
   const b = document.getElementById('body-' + id);
   b.style.display = b.style.display === 'block' ? 'none' : 'block';
